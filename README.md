@@ -28,6 +28,8 @@ conda activate vad
 
 ```bash
 # 预先安装 git、build-essential、CUDA Toolkit 11.7，并配置 nvcc / CUDA_HOME。
+# 先按下文获取 CARLA Linux 客户端 egg，填写实际绝对路径。
+export CARLA_EGG=/实际路径/PythonAPI/carla/dist/carla-版本-python版本-linux-x86_64.egg
 bash scripts/setup_env.sh vad_carla
 conda activate vad_carla
 ```
@@ -57,6 +59,36 @@ ckpts/VAD_tiny.pth
 CARLA 录制输入与中间结果是本地实验产物，无法通过下载权重恢复；本仓库仅在 `demo.html` 中保留精选展示。在线推理入口会禁用骨干预训练初始化，完整 VAD 权重准备好后即可加载。
 
 ### 3. 启动 CARLA 服务端
+
+#### CARLA 客户端依赖（`carla_source` 是否需要上传）
+
+**不需要将 `~/carla_source/` 上传到本仓库，客户端从官方发布包单独获取。** 但当前 `vad` 环境实际上通过 `site-packages/carla.pth` 引用了：
+
+```text
+/home/wjc/carla_source/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
+```
+
+因此，直接删除该目录会导致当前环境无法导入 `carla`。目前 Python 3.8 环境已能加载这份历史 egg，但不保证其他机器也兼容；新安装应选择与 Python 版本、客户端操作系统和服务端相匹配的 API 包，必要时按[官方源码构建说明](https://carla.readthedocs.io/en/0.9.10/build_linux/)编译 Python API。
+
+下载与安装：
+
+1. 从 [CARLA 0.9.10.1 官方发布页](https://github.com/carla-simulator/carla/releases/tag/0.9.10.1)下载并解压所需发布包。当前 Windows 服务端使用 Windows 包；**WSL 客户端需要 Linux 包中的 Python API**，即使服务端在 Windows 上运行。
+2. 在解压目录中找到 `PythonAPI/carla/dist/` 下的 Linux `.egg`。原历史客户端版本的下载入口为 [CARLA 0.9.10 发布页](https://github.com/carla-simulator/carla/releases/tag/0.9.10)。无需把整个 Linux 仿真服务部署到 WSL。
+3. 激活目标环境并安装客户端。脚本将 egg 复制到该环境内部，再写入导入路径，之后不再依赖下载目录：
+
+```bash
+conda activate vad
+# 保留当前已跑通的客户端，将其从 carla_source 复制进环境：
+bash scripts/install_carla_api.sh \
+  /home/wjc/carla_source/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
+
+# 确认输出位于当前 Conda 环境内，而不是 carla_source：
+python -c "import carla; print(carla.__file__)"
+```
+
+新机器将上述路径换成下载得到的 egg；一键环境安装脚本通过 `CARLA_EGG` 参数读取同一文件。安装方法参考 [CARLA 官方安装说明](https://carla.readthedocs.io/en/0.9.10/start_quickstart/)。仓库中的 `vad_carla_bridge0.py` 是旧脚本，也保留了 `carla_source` 的绝对路径；当前 `run.py` 不调用它。
+
+#### 服务端连接
 
 先启动 CARLA 并等待地图加载，再修改 `carla_bridge/run.py` 顶部的连接配置：
 
@@ -110,7 +142,7 @@ requirements-carla.txt       # CARLA 演示依赖
 VADv2/                      # 保留的上游 VADv2 代码
 ```
 
-在线运行不直接使用 nuScenes 数据集，也不依赖同级 `~/carla/` 或 `~/carla_source/` 目录。Python 环境与 CARLA 服务端需要单独准备；安装脚本将 MMDetection3D 源码放在 `~/.local/src/vad-carla/`，可通过 `VAD_DEPS_ROOT` 修改。
+在线运行不直接使用 nuScenes 数据集，也不调用同级 `~/carla/` 项目。当前旧环境仍引用 `~/carla_source/` 中的客户端 egg；按上文复制进环境后即可解除该目录依赖。Python 环境与 CARLA 服务端需要单独准备；安装脚本将 MMDetection3D 源码放在 `~/.local/src/vad-carla/`，可通过 `VAD_DEPS_ROOT` 修改。
 
 运行时图片与每步输入保存到 `carla_bridge/InputDict_check/input_dictC/`，会持续占用磁盘。离线可视化：
 

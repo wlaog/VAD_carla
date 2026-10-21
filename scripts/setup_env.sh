@@ -3,6 +3,10 @@
 set -euo pipefail
 ENV_NAME="${1:-vad_carla}"
 PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -z "${CARLA_EGG:-}" || ! -f "$CARLA_EGG" ]]; then
+    echo '请先从 CARLA Linux 发布包获取客户端 egg，并设置 CARLA_EGG=/绝对路径/carla-版本-python版本-linux-x86_64.egg（见 README）。'
+    exit 1
+fi
 command -v conda >/dev/null || { echo '请先安装 Miniconda，并确保 conda 在 PATH 中。'; exit 1; }
 command -v nvcc >/dev/null || { echo '编译 mmdet3d 需要 CUDA Toolkit 11.7（nvcc），请先安装并配置 CUDA_HOME/PATH。'; exit 1; }
 command -v gcc >/dev/null || { echo '请先安装 build-essential。'; exit 1; }
@@ -19,6 +23,7 @@ python -m pip install 'torch==1.13.1+cu117' 'torchvision==0.14.1+cu117' --extra-
 python -m pip install 'numpy==1.23.5'
 python -m pip install 'mmcv-full==1.7.1' -f https://download.openmmlab.com/mmcv/dist/cu117/torch1.13.0/index.html
 python -m pip install -r "$PROJECT_ROOT/requirements-carla.txt"
+bash "$PROJECT_ROOT/scripts/install_carla_api.sh" "$CARLA_EGG"
 # mmdet3d 包含 CUDA 扩展，需要本地编译；源码保留在项目外。
 DEPS_ROOT="${VAD_DEPS_ROOT:-$HOME/.local/src/vad-carla}"
 mkdir -p "$DEPS_ROOT"
