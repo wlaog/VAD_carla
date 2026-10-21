@@ -156,3 +156,6 @@ dmypy.json
 /tmp_run/
 /work_dirs/
 /my_result.pkl
+
+# Curated, self-contained demo is intentionally versioned
+!/demo.html

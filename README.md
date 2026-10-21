@@ -4,6 +4,14 @@
 
 当前 CARLA 主入口使用 **VAD Tiny**；`VADv2/` 为保留的上游代码，未接入此运行链路。本项目已在 Windows CARLA 服务端 + WSL Python 客户端上跑通。
 
+## Demo 展示
+
+**[打开场景与输出展示页 → demo.html](demo.html)**
+
+包含 `DemoMain.png` 运行截图、CARLA 与 nuScenes 的 GIF 短片、CARLA 六相机 + BEV 场景、nuScenes 六视角轨迹投影及输入检查图。支持切换场景、相机视角、暂停动画和点击图片放大。
+
+图片与 GIF 均内嵌在这一个 HTML 文件中，删除原始输出目录后仍能离线查看；无需安装环境或运行模型。GitHub 仓库中的 HTML 默认显示源码，下载 `demo.html` 后用浏览器打开即可，也可通过 GitHub Pages 托管。
+
 ## Quick Start
 
 以下命令均在仓库根目录执行。
@@ -30,13 +38,23 @@ conda activate vad_carla
 
 ### 2. 准备模型权重
 
-从文末 VAD 上游仓库的模型链接下载 **VAD Tiny** 权重，放到：
+从 [VAD Tiny 官方权重链接](https://drive.google.com/file/d/1KgCC_wFqPH0CQqdr6Pp2smBX5ARPaqne/view?usp=sharing)下载并命名为 `VAD_tiny.pth`，放到：
 
 ```text
 ckpts/VAD_tiny.pth
 ```
 
-权重约 463 MB，不随 Git 提交。配置中的 ResNet50 预训练项可能触发下载；离线使用前需准备对应 Torch 缓存。
+权重约 463 MB，不随 Git 提交。更多可重新下载的资源如下，权重链接来自 [上游模型列表](https://github.com/hustvl/VAD#models)：
+
+| 资源 | 下载入口 | 用途 / 放置位置 |
+| --- | --- | --- |
+| VAD Tiny | [Google Drive](https://drive.google.com/file/d/1KgCC_wFqPH0CQqdr6Pp2smBX5ARPaqne/view?usp=sharing) | 在线主入口必需，`ckpts/VAD_tiny.pth` |
+| VAD Base | [Google Drive](https://drive.google.com/file/d/1FLX-4LVm4z-RskghFbxGuYlcYOQmV5bS/view?usp=sharing) | 部分历史可视化脚本使用，`ckpts/VAD_base.pth` |
+| ResNet50 预训练权重 | [PyTorch 下载](https://download.pytorch.org/models/resnet50-19c8e357.pth) | 上游安装文档使用的骨干权重，可选；单独放在 `ckpts/` 不等于已配置 Torch 缓存 |
+| nuScenes 数据集 | [官网下载页](https://www.nuscenes.org/nuscenes) / [上游数据准备说明](https://github.com/hustvl/VAD/blob/main/docs/prepare_dataset.md) | 仅离线流程需要，按说明准备到 `data/nuscenes/`；下载需登录 |
+| CARLA 0.9.10.1 | [官方版本下载页（Windows / Linux）](https://github.com/carla-simulator/carla/releases/tag/0.9.10.1) | 当前演示所用服务端版本，在仓库外安装 |
+
+CARLA 录制输入与中间结果是本地实验产物，无法通过下载权重恢复；本仓库仅在 `demo.html` 中保留精选展示。在线推理入口会禁用骨干预训练初始化，完整 VAD 权重准备好后即可加载。
 
 ### 3. 启动 CARLA 服务端
 
@@ -86,6 +104,7 @@ projects/
 ├── configs/                 # 模型配置及继承配置
 └── mmdet3d_plugin/           # VAD 模型及自定义数据处理
 ckpts/                       # 本地权重，不提交
+demo.html                    # 精选原图与轻量 GIF，单文件离线展示，随 Git 提交
 scripts/setup_env.sh         # 环境安装脚本
 requirements-carla.txt       # CARLA 演示依赖
 VADv2/                      # 保留的上游 VADv2 代码
@@ -103,7 +122,7 @@ python carla_bridge/run_play.py
 
 ## Git 提交说明
 
-源码、配置及安装脚本纳入版本控制；权重、数据集、CARLA 录制、评测结果、可视化输出和本机 IDE 配置已加入 `.gitignore`。历史实验说明见 [README1210Demo.md](README1210Demo.md)，其中为 nuScenes 离线流程。
+源码、配置、安装脚本及 `demo.html` 纳入版本控制；权重、数据集、CARLA 原始录制、评测结果、批量可视化输出和本机 IDE 配置已加入 `.gitignore`。展示文件内嵌精选原图和 GIF，不依赖被忽略的目录。历史实验说明见 [README1210Demo.md](README1210Demo.md)，其中为 nuScenes 离线流程。
 
 ## 参考
 
