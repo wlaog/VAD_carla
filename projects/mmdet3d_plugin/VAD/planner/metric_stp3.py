@@ -81,6 +81,8 @@ class PlanningMetric():
         segmentation = torch.from_numpy(segmentation_np).long().unsqueeze(0)
         pedestrian = torch.from_numpy(pedestrian_np).long().unsqueeze(0)
 
+
+
         return segmentation, pedestrian
     
     def get_birds_eye_view_label(
@@ -261,6 +263,11 @@ class PlanningMetric():
         # trajs = trajs * torch.tensor([-1, 1], device=trajs.device)
         # gt_trajs = gt_trajs * torch.tensor([-1, 1], device=gt_trajs.device)
 
+        
+        device = trajs.device  # 获取当前显卡的“地址”
+        segmentation = segmentation.to(device)
+        gt_trajs = gt_trajs.to(device)
+
         obj_coll_sum = torch.zeros(n_future, device=segmentation.device)
         obj_box_coll_sum = torch.zeros(n_future, device=segmentation.device)
 
@@ -279,6 +286,7 @@ class PlanningMetric():
             m1 = torch.logical_and(m1, torch.logical_not(gt_box_coll))
 
             ti = torch.arange(n_future)
+            # ti = torch.arange(n_future, device=segmentation.device)
             obj_coll_sum[ti[m1]] += segmentation[i, ti[m1], xi[m1], yi[m1]].long()
 
             m2 = torch.logical_not(gt_box_coll)

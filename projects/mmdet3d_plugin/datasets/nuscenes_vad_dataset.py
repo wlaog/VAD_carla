@@ -1,6 +1,7 @@
 import os
 import json
 import copy
+import pickle
 import tempfile
 from typing import Dict, List
 
@@ -1390,6 +1391,9 @@ class VADCustomNuScenesDataset(NuScenesDataset):
         lidar2global = ego2global @ lidar2ego
         input_dict['lidar2global'] = lidar2global
 
+        
+        with open(os.path.join(rf'carla_bridge/InputDict_check/input_dictN', f'step_{index:04d}.pkl'), 'wb') as f: pickle.dump(input_dict, f)
+
         return input_dict
 
     def __getitem__(self, idx):
@@ -1398,9 +1402,10 @@ class VADCustomNuScenesDataset(NuScenesDataset):
             dict: Data dictionary of the corresponding index.
         """
         if self.test_mode:
+            _4Mentor = self.prepare_test_data(idx);
             return self.prepare_test_data(idx)
         while True:
-
+ 
             data = self.prepare_train_data(idx)
             if data is None:
                 idx = self._rand_another(idx)

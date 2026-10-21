@@ -127,3 +127,32 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Local IDE and Windows download metadata
+/.vscode/
+*:Zone.Identifier
+
+# Model weights and datasets
+/ckpts/
+/data/
+*.pth
+*.pt
+*.onnx
+
+# CARLA recordings and generated visualizations (keep Python tools)
+/carla_bridge/InputDict_check/input_dictC/
+/carla_bridge/InputDict_check/input_dictN/
+/carla_bridge/bev_vis/
+/carla_bridge/step_debug_info/
+/carla_bridge/verification_results/
+/carla_bridge/log/
+
+# Evaluation and local outputs
+/test/
+/check_results/
+/my_video_output*/
+/debug_input_images.png
+/dummy_path/
+/tmp_run/
+/work_dirs/
+/my_result.pkl

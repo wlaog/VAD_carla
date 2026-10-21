@@ -265,7 +265,12 @@ class CustomNuscenesBox:
             fut_coord = fut_coords[i]
             fut_coord = fut_coord.cumsum(axis=-2)
             fut_coord = fut_coord + self.center[:2]
+            # === 奶奶添加的补丁开始 ===
+            if fut_coord.ndim == 3:
+                fut_coord = fut_coord.reshape(-1, 2)
+            # === 奶奶添加的补丁结束 ===
             fut_coord = np.concatenate((self.center[np.newaxis, :2], fut_coord), axis=0)
+
             fut_coord_segments = np.stack((fut_coord[:-1], fut_coord[1:]), axis=1)
 
             fut_vecs = None

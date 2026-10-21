@@ -1,108 +1,113 @@
-## VAD v1 & v2
+# VAD × CARLA
 
-[project page](https://hgao-cv.github.io/VADv2/)
+将开源 VAD Tiny 模型接入 CARLA：采集六路相机图像与自车状态，完成感知、预测与轨迹规划，再通过 PID 将轨迹转换为车辆控制。支持手动驾驶、CARLA 自动驾驶、VAD 控车及输入录制、离线 BEV 可视化。
 
-https://user-images.githubusercontent.com/45144254/229673708-648e8da5-4c70-4346-9da2-423447d1ecde.mp4
+当前 CARLA 主入口使用 **VAD Tiny**；`VADv2/` 为保留的上游代码，未接入此运行链路。本项目已在 Windows CARLA 服务端 + WSL Python 客户端上跑通。
 
-https://github.com/hustvl/VAD/assets/45144254/153b9bf0-5159-46b5-9fab-573baf5c6159
+## Quick Start
 
+以下命令均在仓库根目录执行。
 
-> [**VAD: Vectorized Scene Representation for Efficient Autonomous Driving**](https://arxiv.org/abs/2303.12077)
->
-> [Bo Jiang](https://github.com/rb93dett)<sup>1</sup>\*, [Shaoyu Chen](https://scholar.google.com/citations?user=PIeNN2gAAAAJ&hl=en&oi=sra)<sup>1</sup>\*, Qing Xu<sup>2</sup>, [Bencheng Liao](https://github.com/LegendBC)<sup>1</sup>, Jiajie Chen<sup>2</sup>, [Helong Zhou](https://scholar.google.com/citations?user=wkhOMMwAAAAJ&hl=en&oi=ao)<sup>2</sup>, [Qian Zhang](https://scholar.google.com/citations?user=pCY-bikAAAAJ&hl=zh-CN)<sup>2</sup>, [Wenyu Liu](http://eic.hust.edu.cn/professor/liuwenyu/)<sup>1</sup>, [Chang Huang](https://scholar.google.com/citations?user=IyyEKyIAAAAJ&hl=zh-CN)<sup>2</sup>, [Xinggang Wang](https://xwcv.github.io/)<sup>1,&#8224;</sup>
-> 
-> <sup>1</sup> Huazhong University of Science and Technology, <sup>2</sup> Horizon Robotics
->
-> \*: equal contribution, <sup>&#8224;</sup>: corresponding author.
->
->[arXiv Paper](https://arxiv.org/abs/2303.12077), ICCV 2023
+### 1. Python 环境
 
-## News
-* **`28 Sep, 2025`:** [RAD](https://hgao-cv.github.io/RAD) is accepted by NeurIPS 2025. Core code for RL training is released at [https://github.com/hustvl/RAD](https://github.com/hustvl/RAD).
-* **`27 Feb, 2025`:** Check out our latest work, [DiffusionDrive](https://github.com/hustvl/DiffusionDrive), accepted by CVPR 2025! This study explores multi-modal end-to-end driving using diffusion models for real-time and real-world applications.
-* **`19 Feb, 2025`:** Checkout our new work [RAD](https://hgao-cv.github.io/RAD) 🥰, end-to-end autonomous driving with large-scale 3DGS-based Reinforcement Learning post-training.
-* **`30 Oct, 2024`:** Checkout our new work [Senna](https://github.com/hustvl/Senna) 🥰, which combines VAD/VADv2 with large vision-language models to achieve more accurate, robust, and generalizable autonomous driving planning.
-* **`20 Sep, 2024`:** Core code of VADv2 (config and model) is available in the `VADv2` folder. Easy to integrade it into the VADv1 framework for training and inference.
-* **`17 June, 2024`:** CARLA implementation of VADv1 is available on [Bench2Drive](https://github.com/Thinklab-SJTU/Bench2Drive?tab=readme-ov-file).
-* **`20 Feb, 2024`:** VADv2 is available on arXiv    [paper](https://arxiv.org/pdf/2402.13243)    [project page](https://hgao-cv.github.io/VADv2/).
-* **`1 Aug, 2023`:** Code & models are released!
-* **`14 July, 2023`:** VAD is accepted by ICCV 2023🎉! Code and models will be open source soon!
-* **`21 Mar, 2023`:** We release the VAD paper on [arXiv](https://arxiv.org/abs/2303.12077). Code/Models are coming soon. Please stay tuned! ☕️
+已有可运行的环境时直接执行：
 
-## Introduction
-> VAD is a vectorized paradigm for end-to-end autonomous driving.
-
-<div align="center">
-<img src="./assets/arch.png" />
-</div>
-
-- We propose VAD, an end-to-end unified vectorized paradigm for autonomous driving. VAD models the driving scene as a fully vectorized representation, getting rid of computationally intensive dense rasterized representation and hand-designed post-processing steps.
-- VAD implicitly and explicitly utilizes the vectorized scene information to improve planning safety, via query interaction and vectorized planning constraints.
-- VAD achieves SOTA end-to-end planning performance, outperforming previous methods by a large margin. Not only that, because of the vectorized scene representation and our concise model design, VAD greatly improves the inference speed, which is critical for the real-world deployment of an autonomous driving system.
-
-## Models
-
-| Method | Backbone | avg. L2 | avg. Col. | FPS | Config | Download |
-| :---: | :---: | :---: | :---: |  :---: | :---: | :---: |
-| VAD-Tiny | R50 | 0.78 | 0.38 | 16.8 | [config](projects/configs/VAD/VAD_tiny_stage_2.py) | [model](https://drive.google.com/file/d/1KgCC_wFqPH0CQqdr6Pp2smBX5ARPaqne/view?usp=sharing) |
-| VAD-Base | R50 | 0.72 | 0.22 | 4.5 | [config](projects/configs/VAD/VAD_base_stage_2.py) | [model](https://drive.google.com/file/d/1FLX-4LVm4z-RskghFbxGuYlcYOQmV5bS/view?usp=sharing) |
-
-## Results
-- Open-loop planning results on [nuScenes](https://github.com/nutonomy/nuscenes-devkit). See the [paper](https://arxiv.org/abs/2303.12077) for more details.
-
-| Method | L2 (m) 1s | L2 (m) 2s | L2 (m) 3s | Col. (%) 1s | Col. (%) 2s | Col. (%) 3s | FPS |
-| :---: | :---: | :---: | :---: | :---:| :---: | :---: | :---: |
-| ST-P3 | 1.33 | 2.11 | 2.90 | 0.23 | 0.62 | 1.27 | 1.6 |
-| UniAD | 0.48 | 0.96 | 1.65 | **0.05** | 0.17 | 0.71 | 1.8 |
-| VAD-Tiny | 0.46 | 0.76 | 1.12 | 0.21 | 0.35 | 0.58 | **16.8** |
-| VAD-Base | **0.41** | **0.70** | **1.05** | **0.07** | **0.17** | **0.41** | 4.5 |
-
-- Closed-loop simulation results on [CARLA](https://github.com/carla-simulator/carla).
-
-| Method | Town05 Short DS | Town05 Short RC | Town05 Long DS | Town05 Long RC |
-| :---: | :---: | :---: | :---: | :---:|
-| CILRS | 7.47 | 13.40 | 3.68 | 7.19 |
-| LBC | 30.97 | 55.01 | 7.05 | 32.09 |
-| Transfuser\* | 54.52 | 78.41 | 33.15 | 56.36 |
-| ST-P3 | 55.14 | 86.74 | 11.45 | 83.15 |
-| VAD-Base | **64.29** | **87.26** | **30.31** | 75.20 |
-
-> \*: LiDAR-based method.
-
-## Getting Started
-- [Installation](docs/install.md)
-- [Prepare Dataset](docs/prepare_dataset.md)
-- [Train and Eval](docs/train_eval.md)
-- [Visualization](docs/visualization.md)
-
-## Catalog
-- [x] Code & Checkpoints Release
-- [x] Initialization
-
-## Contact
-If you have any questions or suggestions about this repo, please feel free to contact us (bjiang@hust.edu.cn, outsidercsy@gmail.com).
-
-## Citation
-If you find VAD useful in your research or applications, please consider giving us a star &#127775; and citing it by the following BibTeX entry.
-
-```BibTeX
-@article{jiang2023vad,
-  title={VAD: Vectorized Scene Representation for Efficient Autonomous Driving},
-  author={Jiang, Bo and Chen, Shaoyu and Xu, Qing and Liao, Bencheng and Chen, Jiajie and Zhou, Helong and Zhang, Qian and Liu, Wenyu and Huang, Chang and Wang, Xinggang},
-  journal={ICCV},
-  year={2023}
-}
-
-@article{chen2024vadv2,
-  title={Vadv2: End-to-end vectorized autonomous driving via probabilistic planning},
-  author={Chen, Shaoyu and Jiang, Bo and Gao, Hao and Liao, Bencheng and Xu, Qing and Zhang, Qian and Huang, Chang and Liu, Wenyu and Wang, Xinggang},
-  journal={arXiv preprint arXiv:2402.13243},
-  year={2024}
-}
+```bash
+conda activate vad
 ```
 
-## License
-All code in this repository is under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+新机器可使用安装脚本（Linux / WSL、Miniconda、NVIDIA GPU）：
 
-## Acknowledgement
-VAD is based on the following projects: [mmdet3d](https://github.com/open-mmlab/mmdetection3d), [detr3d](https://github.com/WangYueFt/detr3d), [BEVFormer](https://github.com/fundamentalvision/BEVFormer) and [MapTR](https://github.com/hustvl/MapTR). Many thanks for their excellent contributions to the community.
+```bash
+# 预先安装 git、build-essential、CUDA Toolkit 11.7，并配置 nvcc / CUDA_HOME。
+bash scripts/setup_env.sh vad_carla
+conda activate vad_carla
+```
+
+脚本创建独立环境，安装 PyTorch、OpenMMLab 栈、CARLA Python API 和可视化依赖，并编译 MMDetection3D。核心版本来自当前运行环境：Python 3.8、PyTorch 1.13.1+cu117、MMCV 1.7.1、MMDetection 2.28.2、MMDetection3D 1.0.0rc6。其他依赖见 [requirements-carla.txt](requirements-carla.txt)。
+
+**安装脚本尚未在全新环境验证**；旧 CUDA 扩展可能需要适配本机编译器。原 `requirements.txt` 是历史环境清单，不是本项目的一键 pip 安装入口。
+
+### 2. 准备模型权重
+
+从文末 VAD 上游仓库的模型链接下载 **VAD Tiny** 权重，放到：
+
+```text
+ckpts/VAD_tiny.pth
+```
+
+权重约 463 MB，不随 Git 提交。配置中的 ResNet50 预训练项可能触发下载；离线使用前需准备对应 Torch 缓存。
+
+### 3. 启动 CARLA 服务端
+
+先启动 CARLA 并等待地图加载，再修改 `carla_bridge/run.py` 顶部的连接配置：
+
+```python
+HOST = '127.0.0.1'; PORT = 2000; TM_PORT = 8000
+```
+
+当前 Windows + WSL 配置已验证可通过 `127.0.0.1:2000` 连接。其他部署方式填写从 Python 客户端可达的服务端地址，并放通 RPC、传感器流等所需端口；Traffic Manager 使用 `8000`。客户端 API 应与服务端版本匹配。当前服务端报告 `0.9.10.1`，Python 包为 `carla==0.9.10`，仍会出现版本警告，后续建议统一版本。
+
+可先在运行 VAD 的终端检查 TCP 连接：
+
+```bash
+python -c "import socket; s=socket.create_connection(('127.0.0.1',2000),timeout=5); print('连接成功'); s.close()"
+```
+
+### 4. 运行与操作
+
+```bash
+python carla_bridge/run.py
+```
+
+等待权重加载完成，点击 Pygame 窗口获得键盘焦点。初始模式为暂停。
+
+| 按键 | 功能 |
+| --- | --- |
+| A / Enter | CARLA 自动驾驶 |
+| V | VAD 轨迹规划 + PID 控车 |
+| M | 手动模式：方向键驾驶，空格手刹 |
+| R | 重新生成交通车辆 |
+| Q | 退出 |
+
+默认创建 30 辆交通车、10 个行人，仿真步长 0.1 秒。部分行人因出生点碰撞生成失败时可继续运行。模型跨数据域应用于 CARLA，当前演示不代表已通过驾驶能力评测；导航指令目前在适配器中固定设置。
+
+## 目录与运行依赖
+
+```text
+carla_bridge/
+├── run.py                   # 在线仿真入口、传感器与模式控制
+├── vad_carla_bridge.py      # 输入适配、VAD 推理、PID 控车
+├── run_play.py              # 录制输入离线推理及 BEV 输出（Tiny）
+├── visualization.py         # 另一套 BEV 可视化（当前选择 Base 权重）
+├── input_compare.py         # CARLA / nuScenes 输入对比
+└── InputDict_check/         # 调试工具与本地录制数据
+projects/
+├── configs/                 # 模型配置及继承配置
+└── mmdet3d_plugin/           # VAD 模型及自定义数据处理
+ckpts/                       # 本地权重，不提交
+scripts/setup_env.sh         # 环境安装脚本
+requirements-carla.txt       # CARLA 演示依赖
+VADv2/                      # 保留的上游 VADv2 代码
+```
+
+在线运行不直接使用 nuScenes 数据集，也不依赖同级 `~/carla/` 或 `~/carla_source/` 目录。Python 环境与 CARLA 服务端需要单独准备；安装脚本将 MMDetection3D 源码放在 `~/.local/src/vad-carla/`，可通过 `VAD_DEPS_ROOT` 修改。
+
+运行时图片与每步输入保存到 `carla_bridge/InputDict_check/input_dictC/`，会持续占用磁盘。离线可视化：
+
+```bash
+python carla_bridge/run_play.py
+```
+
+该脚本默认从第 9 步读取录制数据，图片路径需仍有效；输出到录制目录下的 `bev_vis/`。其他可视化脚本可能使用不同权重，请先检查脚本末尾配置。
+
+## Git 提交说明
+
+源码、配置及安装脚本纳入版本控制；权重、数据集、CARLA 录制、评测结果、可视化输出和本机 IDE 配置已加入 `.gitignore`。历史实验说明见 [README1210Demo.md](README1210Demo.md)，其中为 nuScenes 离线流程。
+
+## 参考
+
+- [上游 VAD 仓库及原始 README](https://github.com/hustvl/VAD)：模型、权重下载与论文资料。
+- [CARLA](https://github.com/carla-simulator/carla)
+
+本项目基于上游 VAD 修改，保留原有 [LICENSE](LICENSE) 及源码版权声明。

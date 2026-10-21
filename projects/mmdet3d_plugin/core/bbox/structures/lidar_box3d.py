@@ -2,8 +2,10 @@
 import numpy as np
 import torch
 
+# from mmdet3d.ops.roiaware_pool3d import points_in_boxes_gpu
 from mmdet3d.core.points import BasePoints
-from mmdet3d.ops.roiaware_pool3d import points_in_boxes_gpu
+# from mmdet3d.ops import points_in_boxes_gpu
+from mmcv.ops import points_in_boxes_part as points_in_boxes_gpu
 from mmdet3d.core.bbox.structures.base_box3d import BaseInstance3DBoxes
 from mmdet3d.core.bbox.structures.utils import limit_period, rotation_3d_in_axis
 

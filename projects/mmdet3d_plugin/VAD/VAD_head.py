@@ -285,7 +285,7 @@ class VADHead(DETRHead):
 
     def _init_layers(self):
         """Initialize classification branch and regression branch of head."""
-        cls_branch = []
+        cls_branch = []  # 检测框分类分支
         for _ in range(self.num_reg_fcs):
             cls_branch.append(Linear(self.embed_dims, self.embed_dims))
             cls_branch.append(nn.LayerNorm(self.embed_dims))
@@ -293,21 +293,21 @@ class VADHead(DETRHead):
         cls_branch.append(Linear(self.embed_dims, self.cls_out_channels))
         cls_branch = nn.Sequential(*cls_branch)
 
-        reg_branch = []
+        reg_branch = []  # 3D检测框回归
         for _ in range(self.num_reg_fcs):
             reg_branch.append(Linear(self.embed_dims, self.embed_dims))
             reg_branch.append(nn.ReLU())
         reg_branch.append(Linear(self.embed_dims, self.code_size))
         reg_branch = nn.Sequential(*reg_branch)
 
-        traj_branch = []
+        traj_branch = []  # 未来轨迹预测
         for _ in range(self.num_reg_fcs):
             traj_branch.append(Linear(self.embed_dims*2, self.embed_dims*2))
             traj_branch.append(nn.ReLU())
         traj_branch.append(Linear(self.embed_dims*2, self.fut_ts*2))
         traj_branch = nn.Sequential(*traj_branch)
 
-        traj_cls_branch = []
+        traj_cls_branch = []  # 轨迹分类分支（多模态）
         for _ in range(self.num_reg_fcs):
             traj_cls_branch.append(Linear(self.embed_dims*2, self.embed_dims*2))
             traj_cls_branch.append(nn.LayerNorm(self.embed_dims*2))
@@ -315,7 +315,7 @@ class VADHead(DETRHead):
         traj_cls_branch.append(Linear(self.embed_dims*2, self.traj_num_cls))
         traj_cls_branch = nn.Sequential(*traj_cls_branch)
 
-        map_cls_branch = []
+        map_cls_branch = []  # 地图元素分类分支
         for _ in range(self.num_reg_fcs):
             map_cls_branch.append(Linear(self.embed_dims, self.embed_dims))
             map_cls_branch.append(nn.LayerNorm(self.embed_dims))

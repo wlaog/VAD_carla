@@ -730,13 +730,16 @@ def parse_args():
 
 
 if __name__ == '__main__':
-    args = parse_args()
-    inference_result_path = args.result_path
-    out_path = args.save_path
+    # args = parse_args()
+    # inference_result_path = args.result_path
+    # out_path = args.save_path
+    inference_result_path=r'test/VAD_tiny_e2e/Thu_Dec_18_15_20_06_2025/pts_bbox/results_nusc.pkl'
+    out_path=r'my_video_output1'
     bevformer_results = mmcv.load(inference_result_path)
     sample_token_list = list(bevformer_results['results'].keys())
 
-    nusc = NuScenes(version='v1.0-trainval', dataroot='./data/nuscenes', verbose=True)
+    # nusc = NuScenes(version='v1.0-trainval', dataroot='./data/nuscenes', verbose=True)
+    nusc = NuScenes(version='v1.0-mini', dataroot='./data/nuscenes', verbose=True)
     
     imgs = []
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
